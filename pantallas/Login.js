@@ -32,9 +32,13 @@ const LoginScreen = ({ navigation }) => {
 
     const data = await fetchToken();
     console.log('login:', data);
+
+    // Verifica que los datos contengan el token y el usuario
     if (data && data.token) {
       setToken(data.token);
-      setUsuario(data.usuario); // Establece el usuario si el servidor lo devuelve
+      // Asegúrate de que data.usuario sea el campo correcto
+      setUsuario(data.usuario || data.user); // Establece el usuario si el servidor lo devuelve
+      console.log('Usuario guardado en contexto:', data.usuario || data.user);
     } else {
       Alert.alert('Error', 'Usuario o contraseña inválidos.'); // Alerta de credenciales inválidas
     }

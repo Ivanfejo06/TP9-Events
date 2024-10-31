@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, TextInput, ScrollView, TouchableWithoutFeedback, Keyboard, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Button, TextInput, ScrollView, TouchableWithoutFeedback, Keyboard, SafeAreaView, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker'; 
 import DBDomain from '../constants/DBDomain.js';
 import { useUserContext } from '../context/userContext.js';
-import ConfirmacionModal from '../components/Confirmacion.js';
 
 function FormularioScreen({ navigation }) {
   const { usuario, token } = useUserContext();
@@ -37,16 +36,16 @@ function FormularioScreen({ navigation }) {
   const fetchCategories = async () => {
     const urlApi = `${DBDomain}/api/event_categories`;
     try {
-        const response = await fetch(urlApi);
-        if (!response.ok) throw new Error('Failed to fetch data');
+      const response = await fetch(urlApi);
+      if (!response.ok) throw new Error('Failed to fetch data');
 
-        const data = await response.json();
-        console.log('Data fetched from categories API:', data); 
-        if (!data) throw new Error('No data returned');
+      const data = await response.json();
+      console.log('Data fetched from categories API:', data); 
+      if (!data) throw new Error('No data returned');
 
-        return data;
+      return data;
     } catch (error) {
-        console.log('Hubo un error en el fetchCategories', error);
+      console.log('Hubo un error en el fetchCategories', error);
     }
   };
 
@@ -85,8 +84,6 @@ function FormularioScreen({ navigation }) {
     fetchAndSetLocations();
   }, []);
 
-  const [visible, setVisible] = useState(false);
-
   const openDatePicker = () => setShowDatePicker(true);
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || start_date;
@@ -96,39 +93,44 @@ function FormularioScreen({ navigation }) {
 
   const openDurationPicker = () => setDurationPickerOpen(!durationPickerOpen);
   
-  // Handle the confirm action for duration picker (if necessary)
   const handleDurationChange = (itemValue) => {
     setDurationInMinutes(itemValue);
     setDurationPickerOpen(false);
   };
 
   const crearEvento = async () => {
-    const urlApi = `${DBDomain}/api/events`; // Asegúrate de que esta URL sea correcta
+    const urlApi = `${DBDomain}/api/event`;
     try {
-      const response = await fetch(urlApi, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Asegúrate de que el token de autenticación sea correcto
-        },
-        body: JSON.stringify(newEvent),
-      });
+        console.log('Token utilizado para la autorización:', token);
+        console.log('Datos del nuevo evento:', newEvent);
+        console.log('Datos del nuevo evento:', usuario);
 
-      if (!response.ok) throw new Error('Failed to create event');
+        const response = await fetch(urlApi, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(newEvent),
+        });
 
-      const result = await response.json();
-      console.log('Evento creado:', result);
-      // Aquí podrías navegar a otra pantalla o hacer algo más con el resultado
-      navigation.navigate('Home');
+        if (!response.ok) {
+            const errorText = await response.text(); // Obtener el texto de error de la respuesta
+            throw new Error(`Failed to create event: ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('Evento creado:', result);
+        Alert.alert("Éxito", "Evento creado correctamente", [{ text: "OK", onPress: () => navigation.navigate('Home') }]);
     } catch (error) {
-      console.log('Hubo un error al crear el evento', error);
+        console.log('Hubo un error al crear el evento', error);
+        Alert.alert("Error", "No se pudo crear el evento", [{ text: "OK" }]);
     }
-  };
+};
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.container}>
-        <ConfirmacionModal visible={visible} setVisible={setVisible} newEvent={newEvent} />
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.title}>Registro de Evento</Text>
           <View style={styles.inputContainer}>
@@ -184,7 +186,6 @@ function FormularioScreen({ navigation }) {
                 onValueChange={handleDurationChange}
                 style={styles.picker}
               >
-                {/* Add duration options here */}
                 {Array.from({ length: 25 }, (_, i) => (i + 1) * 15).map(value => (
                   <Picker.Item key={value} label={`${value} minutos`} value={value} />
                 ))}
@@ -212,7 +213,7 @@ function FormularioScreen({ navigation }) {
               style={styles.input}
             />
           </View>
-          <Button title="Confirmar" onPress={() => crearEvento()} />
+          <Button title="Confirmar" onPress={crearEvento} />
           <Button title="Cancelar" onPress={() => navigation.navigate('Home')} />
         </ScrollView>
       </SafeAreaView>
