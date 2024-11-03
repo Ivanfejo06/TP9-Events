@@ -40,7 +40,8 @@ function HomeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.welcomeText}>Bienvenido</Text>
+      <Text style={styles.welcomeText}>App Eventos</Text>
+      <Text style={styles.subtitle}>Bienvenido</Text>
       <View style={styles.buttonContainer}>
         <Button title="Cargar nuevo evento" onPress={() => navigation.navigate('Formulario')} />
       </View>
@@ -63,21 +64,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9', // Color de fondo más suave
+    backgroundColor: '#000', // Color de fondo más suave
     paddingTop: 20,
   },
   welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 40, 
+    fontWeight: "bold",
+    marginBottom: 30,
+    color: "white"
+  },
+  subtitle:{
+    fontSize: 16,
     marginBottom: 20,
-    color: '#333', // Color del texto
+    color: "white"
   },
   buttonContainer: {
     marginBottom: 20,
     width: '80%', // Ancho del botón
   },
   flatListContent: {
-    paddingBottom: 20, // Padding inferior para el FlatList
+    paddingHorizontal: 20
   },
 });
 

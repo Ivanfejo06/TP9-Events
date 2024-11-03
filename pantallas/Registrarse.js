@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TextInput, Button, Alert } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Button, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import axios from 'axios';
 import DBDomain from '../constants/DBDomain.js';
 import { useNavigation } from '@react-navigation/native';
@@ -18,10 +18,10 @@ const RegistrarseScreen = () => {
                 first_name: firstName,
                 last_name: lastName,
                 username: email,
-                password: contraseña,
+                password: contraseña,       
             });
 
-            if (response.status !== 200) {
+            if (response.status !== 201) {
                 throw new Error('Failed to register user');
             }
 
@@ -43,43 +43,50 @@ const RegistrarseScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Registro de Usuario</Text>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder="Primer nombre"
-                    value={firstName}
-                    onChangeText={setFirstName}
-                    autoCapitalize="none"
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder="Apellido"
-                    value={lastName}
-                    onChangeText={setLastName}
-                    autoCapitalize="none"
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder="Contraseña"
-                    value={contraseña}
-                    onChangeText={setContraseña}
-                    autoCapitalize="none"
-                    secureTextEntry
-                    style={styles.input}
-                />
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <View style={styles.container}>
+                <Text style={styles.title}>App Eventos</Text>
+                <Text style={styles.subtitle}>Registrarse</Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        placeholder="Primer nombre"
+                        value={firstName}
+                        onChangeText={setFirstName}
+                        autoCapitalize="none"
+                        style={styles.input}
+                        placeholderTextColor={"#ccc"}
+                    />
+                    <TextInput
+                        placeholder="Apellido"
+                        value={lastName}
+                        onChangeText={setLastName}
+                        autoCapitalize="none"
+                        style={styles.input}
+                        placeholderTextColor={"#ccc"}
+                    />
+                    <TextInput
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        style={styles.input}
+                        placeholderTextColor={"#ccc"}
+                    />
+                    <TextInput
+                        placeholder="Contraseña"
+                        value={contraseña}
+                        onChangeText={setContraseña}
+                        autoCapitalize="none"
+                        secureTextEntry
+                        style={styles.input}
+                        placeholderTextColor={"#ccc"}
+                    />
+                </View>
+                <Button title="Registrarse" onPress={registrarse} />
+                <Button title="¿Ya tienes cuenta?" onPress={() => navigation.navigate('Login')} />
             </View>
-            <Button title="Registrarse" onPress={registrarse} />
-            <Button title="¿Ya tienes cuenta?" onPress={() => navigation.navigate('Login')} />
-        </View>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -88,13 +95,19 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#000',
         padding: 20,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
+        fontSize: 40, 
+        fontWeight: "bold",
+        marginBottom: 30,
+        color: "white",
+    },
+    subtitle:{
+        fontSize: 16,
         marginBottom: 20,
+        color: "white"
     },
     inputContainer: {
         width: '100%',
@@ -106,6 +119,7 @@ const styles = StyleSheet.create({
         padding: 10,
         marginVertical: 10,
         borderRadius: 5,
+        color:"white"
     },
 });
 

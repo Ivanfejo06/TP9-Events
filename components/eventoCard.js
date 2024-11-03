@@ -5,18 +5,13 @@ const EventoCard = ({ props }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>{props.name || 'Nombre no disponible'}</Text>
-      <Text style={styles.descripcion}>Descripción: {props.description || 'Descripción no disponible'}</Text>
+      <Text style={styles.descripcion}>{props.description || 'Descripción no disponible'}</Text>
 
-      <Text style={styles.subtitulo}>Categorías:</Text>
-      <FlatList
-        data={props.Category || []} // Evitar errores si Category es undefined
-        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
-        keyExtractor={(item) => item.id.toString()} // Asegúrate de que cada item tenga un id
-      />
+      
 
       <Text style={styles.subtitulo}>Lugar:</Text>
       <FlatList
-        data={props.Ubication || []} // Evitar errores si Ubication es undefined
+        data={props.ubication || []} // Evitar errores si Ubication es undefined
         renderItem={({ item }) => <Text style={styles.item}>{item.item || 'Lugar no disponible'}</Text>}
         keyExtractor={(item) => item.id.toString()} // Asegúrate de que cada item tenga un id
       />
@@ -26,7 +21,13 @@ const EventoCard = ({ props }) => {
       <Text style={styles.info}>Precio: {props.price || 'Precio no disponible'}</Text>
       <Text style={styles.info}>Cupos disponibles: {props.enabled_for_enrollment || 'Información no disponible'}</Text>
       <Text style={styles.info}>Cantidad máxima de personas: {props.max_assistance || 'Información no disponible'}</Text>
-      <Text style={styles.info}>Creador: {props.User ? props.User.username : 'Creador no disponible'}</Text>
+
+      <Text style={styles.subtitulo}>Categorías:</Text>
+      <FlatList
+        data={props.category} // Evitar errores si Category es undefined
+        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
+        keyExtractor={(item) => item.id.toString()} // Asegúrate de que cada item tenga un id
+      />
     </View>
   );
 };
@@ -48,7 +49,8 @@ const styles = StyleSheet.create({
     elevation: 3, // Para Android
     padding: 15, // Padding general
     marginVertical: 10, // Separación entre tarjetas
-    width: '90%', // Ancho de la tarjeta
+    width: '100%', // Ancho de la tarjeta
+    alignItems: "center"
   },
   titulo: {
     fontSize: 24,
