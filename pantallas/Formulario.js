@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, TextInput, ScrollView, TouchableWithoutFeedback, Keyboard, SafeAreaView, Alert } from 'react-native';
+import { View, Text, StyleSheet, Button, TextInput, ScrollView, TouchableWithoutFeedback, Keyboard, SafeAreaView, Modal, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker'; 
 import DBDomain from '../constants/DBDomain.js';
@@ -15,13 +15,14 @@ function FormularioScreen({ navigation }) {
   const [id_event_location, setIdEventLocation] = useState(''); 
   const [start_date, setStartDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [duration_in_minutes, setDurationInMinutes] = useState(15); // Default to 15 minutes
+  const [duration_in_minutes, setDurationInMinutes] = useState(15);
   const [durationPickerOpen, setDurationPickerOpen] = useState(false);
   const [price, setPrice] = useState('');
   const [max_assistance, setMaxAssistance] = useState('');
+  const [modalVisible, setModalVisible] = useState(false); // Estado para el modal de resumen
+  const [eventCreated, setEventCreated] = useState(false); // Estado para controlar la creación de eventos
 
-  // NewEvent object
-  let newEvent = {
+  const newEvent = {
     name,
     description,
     id_event_category,
@@ -38,12 +39,7 @@ function FormularioScreen({ navigation }) {
     try {
       const response = await fetch(urlApi);
       if (!response.ok) throw new Error('Failed to fetch data');
-
-      const data = await response.json();
-      console.log('Data fetched from categories API:', data); 
-      if (!data) throw new Error('No data returned');
-
-      return data;
+      return await response.json();
     } catch (error) {
       console.log('Hubo un error en el fetchCategories', error);
     }
@@ -54,12 +50,7 @@ function FormularioScreen({ navigation }) {
     try {
       const response = await fetch(urlApi);
       if (!response.ok) throw new Error('Failed to fetch data');
-
-      const data = await response.json();
-      if (!data) throw new Error('No data returned');
-
-      console.log('data: ', data);
-      return data;
+      return await response.json();
     } catch (error) {
       console.log('Hubo un error en el fetchLocations', error);
     }
@@ -98,13 +89,9 @@ function FormularioScreen({ navigation }) {
     setDurationPickerOpen(false);
   };
 
-  const crearEvento = async () => {
+  const confirmEventCreation = async () => {
     const urlApi = `${DBDomain}/api/event`;
     try {
-        console.log('Token utilizado para la autorización:', token);
-        console.log('Datos del nuevo evento:', newEvent);
-        console.log('Datos del nuevo evento:', usuario);
-
         const response = await fetch(urlApi, {
             method: 'POST',
             headers: {
@@ -115,18 +102,22 @@ function FormularioScreen({ navigation }) {
         });
 
         if (!response.ok) {
-            const errorText = await response.text(); // Obtener el texto de error de la respuesta
+            const errorText = await response.text();
             throw new Error(`Failed to create event: ${errorText}`);
         }
 
         const result = await response.json();
-        console.log('Evento creado:', result);
-        Alert.alert("Éxito", "Evento creado correctamente", [{ text: "OK", onPress: () => navigation.navigate('Home') }]);
+        setEventCreated(true); // Cambiamos el estado para mostrar el modal de éxito
+        setModalVisible(false); // Cerrar el modal de resumen
     } catch (error) {
         console.log('Hubo un error al crear el evento', error);
         Alert.alert("Error", "No se pudo crear el evento", [{ text: "OK" }]);
     }
-};
+  };
+
+  const openSummaryModal = () => {
+    setModalVisible(true);
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -140,6 +131,7 @@ function FormularioScreen({ navigation }) {
               onChangeText={setName}
               autoCapitalize="none"
               style={styles.input}
+              placeholderTextColor={"#aaa"}
             />
             <TextInput
               placeholder="Descripción"
@@ -147,6 +139,7 @@ function FormularioScreen({ navigation }) {
               onChangeText={setDescription}
               autoCapitalize="none"
               style={styles.input}
+              placeholderTextColor={"#aaa"}
             />
             <Picker
               selectedValue={id_event_category}
@@ -204,6 +197,7 @@ function FormularioScreen({ navigation }) {
               onChangeText={setPrice}
               autoCapitalize="none"
               style={styles.input}
+              placeholderTextColor={"#aaa"}
             />
             <TextInput
               placeholder="Cantidad máxima de personas"
@@ -211,10 +205,56 @@ function FormularioScreen({ navigation }) {
               onChangeText={setMaxAssistance}
               autoCapitalize="none"
               style={styles.input}
+              placeholderTextColor={"#aaa"}
             />
           </View>
-          <Button title="Confirmar" onPress={crearEvento} />
-          <Button title="Cancelar" onPress={() => navigation.navigate('Home')} />
+          <Button title="Confirmar" onPress={openSummaryModal} color="#841584" />
+          <Button title="Cancelar" onPress={() => navigation.navigate('Home')} color="#ccc" />
+
+          {/* Modal de resumen */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Resumen del Evento</Text>
+              <Text>Nombre: {name}</Text>
+              <Text>Descripción: {description}</Text>
+              <Text>Categoría: {id_event_category}</Text>
+              <Text>Ubicación: {id_event_location}</Text>
+              <Text>Fecha: {start_date.toLocaleDateString()}</Text>
+              <Text>Duración: {duration_in_minutes} minutos</Text>
+              <Text>Precio: {price}</Text>
+              <Text>Cantidad máxima: {max_assistance}</Text>
+              <View style={styles.buttonContainer}>
+                <Button title="Confirmar" onPress={confirmEventCreation} />
+                <Button title="Cancelar" onPress={() => setModalVisible(false)} />
+              </View>
+            </View>
+          </Modal>
+
+          {/* Modal de éxito */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={eventCreated}
+            onRequestClose={() => {
+              setEventCreated(!eventCreated);
+              navigation.navigate('Home'); // Redirigir a Home al cerrar el modal
+            }}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Éxito</Text>
+              <Text>Su evento se ha publicado correctamente.</Text>
+              <Button title="Aceptar" onPress={() => {
+                setEventCreated(false);
+                navigation.navigate('Home');
+              }} />
+            </View>
+          </Modal>
+
         </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -225,7 +265,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000',
     paddingHorizontal: 20,
   },
   scrollContainer: {
@@ -234,8 +274,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 24,
-    marginBottom: 20,
+    fontSize: 40, 
+    fontWeight: "bold",
+    marginBottom: 30,
+    color: "white",
+    marginTop: 20
   },
   inputContainer: {
     width: '100%',
@@ -247,16 +290,40 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 10,
     borderRadius: 5,
+    backgroundColor: '#000',
+    color: '#fff',
   },
   picker: {
     borderWidth: 1,
     borderColor: '#ccc',
     marginVertical: 10,
     borderRadius: 5,
+    backgroundColor: '#FFF',
   },
-  datePicker: {
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    marginBottom: 15,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
     width: '100%',
-    marginVertical: 10,
   },
 });
 
