@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Button, Alert, SafeAreaView } from 'react-native';
 import axios from 'axios';
 import DBDomain from '../constants/DBDomain.js';
+import { useUserContext } from '../context/userContext.js';
 
 function AdminEventsScreen({ navigation }) {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
+  const { token } = useUserContext();
 
   const fetchEvents = async () => {
     const now = new Date().toISOString();
     try {
-      const response = await axios.get(`${DBDomain}/api/events?start_date=${now}`);
+      const response = await axios.get(`${DBDomain}/api/event?start_date=${now}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const events = response.data;
 
       const upcoming = events.filter(event => new Date(event.start_date) >= new Date());
@@ -32,7 +36,7 @@ function AdminEventsScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Eventos Próximos</Text>
       <FlatList
         data={upcomingEvents}
@@ -40,8 +44,8 @@ function AdminEventsScreen({ navigation }) {
         renderItem={({ item }) => (
           <View style={styles.eventContainer}>
             <Text style={styles.eventName}>{item.name}</Text>
-            <Button title="Ver Detalles" onPress={() => navigation.navigate('EventDetail', { id_event: item.id })} />
-            <Button title="Editar" onPress={() => handleEditEvent(item.id)} />
+            <Button title="Ver Detalles" onPress={() => navigation.navigate('EventDetail', { id_event: item.id })} color="#841584" />
+            <Button title="Editar" onPress={() => handleEditEvent(item.id)} color="#841584" />
           </View>
         )}
       />
@@ -55,29 +59,32 @@ function AdminEventsScreen({ navigation }) {
           </View>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: 15,
+    backgroundColor: '#000',
+    paddingHorizontal: 15
   },
   title: {
-    fontSize: 24,
-    marginBottom: 10,
+    fontSize: 40,
+    fontWeight: "bold",
+    marginBottom: 30,
+    color: "white"
   },
   eventContainer: {
     marginBottom: 15,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    padding: 15,
+    backgroundColor: '#222',
+    borderRadius: 8,
   },
   eventName: {
     fontSize: 18,
+    color: '#fff',
   },
 });
 

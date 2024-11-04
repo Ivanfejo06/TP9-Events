@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, FlatList, SafeAreaView } from 'react-native';
 import axios from 'axios';
 import DBDomain from '../constants/DBDomain.js';
 
@@ -42,24 +42,24 @@ function EventDetailScreen({ route, navigation }) {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {event ? (
         <>
           <Text style={styles.title}>{event.name}</Text>
-          <Text>{event.description}</Text>
-          <Text>Fecha: {event.start_date}</Text>
-          <Button title="Eliminar Evento" onPress={handleDeleteEvent} />
+          <Text style={styles.description}>{event.description}</Text>
+          <Text style={styles.info}>Fecha: {event.start_date}</Text>
+          <Button title="Eliminar Evento" onPress={handleDeleteEvent} color="#841584" />
           <Text style={styles.title}>Participantes</Text>
           <FlatList
             data={participants}
             keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => <Text>{item.name}</Text>}
+            renderItem={({ item }) => <Text style={styles.participantName}>{item.name}</Text>}
           />
         </>
       ) : (
-        <Text>Cargando...</Text>
+        <Text style={styles.loadingText}>Cargando...</Text>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -67,11 +67,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
   title: {
     fontSize: 24,
     marginBottom: 10,
+    color: '#fff',
+  },
+  description: {
+    fontSize: 16,
+    marginBottom: 15,
+    color: '#ccc',
+  },
+  info: {
+    fontSize: 16,
+    color: '#ddd',
+    marginBottom: 15,
+  },
+  participantName: {
+    color: '#fff',
+    marginVertical: 5,
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
   },
 });
 
