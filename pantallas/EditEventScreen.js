@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList } from 'react-native';
 import axios from 'axios';
 import DBDomain from '../constants/DBDomain.js';
 
-function ParticipantsListScreen({ route }) {
+function EditEventScreen({ route }) {
   const { id_event } = route.params;
   const [participants, setParticipants] = useState([]);
 
@@ -44,4 +44,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ParticipantsListScreen;
+export default EditEventScreen;

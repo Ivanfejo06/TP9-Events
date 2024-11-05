@@ -26,19 +26,26 @@ const LoginScreen = ({ navigation }) => {
 
   const generateToken = async () => {
     if (!email) {
-      Alert.alert('Error', 'El correo electrónico es requerido.');
-      return;
+        Alert.alert('Error', 'El correo electrónico es requerido.');
+        return;
     }
 
     const data = await fetchToken();
-    console.log('login:', data);
+    console.log('Respuesta del login:', data); // Verificar la estructura de la respuesta
 
     if (data && data.token) {
-      setToken(data.token);
-      setUsuario(data.usuario || data.user);
-      console.log('Usuario guardado en contexto:', data.usuario || data.user);
+        setToken(data.token);
+
+        // Intentar guardar el usuario en el contexto verificando si `usuario` o `user` están presentes
+        const userData = data.user;
+        if (userData) {
+            setUsuario(userData);
+            console.log('Usuario guardado en contexto:', userData);
+        } else {
+            console.warn('No se encontró información de usuario en la respuesta');
+        }
     } else {
-      Alert.alert('Error', 'Usuario o contraseña inválidos.');
+        Alert.alert('Error', 'Usuario o contraseña inválidos.');
     }
   };
 

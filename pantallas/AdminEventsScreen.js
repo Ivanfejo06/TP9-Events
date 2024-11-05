@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, Alert, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Button, SafeAreaView, ScrollView } from 'react-native';
 import axios from 'axios';
 import DBDomain from '../constants/DBDomain.js';
 import { useUserContext } from '../context/userContext.js';
@@ -37,28 +37,30 @@ function AdminEventsScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Eventos Próximos</Text>
-      <FlatList
-        data={upcomingEvents}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.eventContainer}>
-            <Text style={styles.eventName}>{item.name}</Text>
-            <Button title="Ver Detalles" onPress={() => navigation.navigate('EventDetail', { id_event: item.id })} color="#841584" />
-            <Button title="Editar" onPress={() => handleEditEvent(item.id)} color="#841584" />
-          </View>
-        )}
-      />
-      <Text style={styles.title}>Eventos Pasados</Text>
-      <FlatList
-        data={pastEvents}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.eventContainer}>
-            <Text style={styles.eventName}>{item.name}</Text>
-          </View>
-        )}
-      />
+      <View style={styles.container}>
+        <Text style={styles.title}>Eventos Próximos</Text>
+        <FlatList
+          data={upcomingEvents}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.eventContainer}>
+              <Text style={styles.eventName}>{item.name}</Text>
+              <Button title="Ver Detalles" onPress={() => navigation.navigate('EventDetail', { id_event: item.id })} color="#841584" />
+              <Button title="Editar" onPress={() => handleEditEvent(item.id)} color="#841584" />
+            </View>
+          )}
+        />
+        <Text style={styles.title}>Eventos Pasados</Text>
+        <FlatList
+          data={pastEvents}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.eventContainer}>
+              <Text style={styles.eventName}>{item.name}</Text>
+            </View>
+          )}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -66,9 +68,8 @@ function AdminEventsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
     backgroundColor: '#000',
-    paddingHorizontal: 15
+    padding: 15
   },
   title: {
     fontSize: 40,

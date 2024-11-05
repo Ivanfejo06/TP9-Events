@@ -6,7 +6,7 @@ import { useUserContext } from '../context/userContext.js';
 
 function DetallesEventoScreen({ navigation, route }) {
     const { id_event } = route.params;
-    const { usuario } = useUserContext();
+    const { usuario, token } = useUserContext();
     const [evento, setEvento] = useState();
     const [error, setError] = useState(null);
     const [capacidadMaxima, setCapacidadMaxima] = useState(0);
@@ -33,7 +33,9 @@ function DetallesEventoScreen({ navigation, route }) {
                 attended: 0,
                 observations: '',
                 rating: '',
-            });
+            }, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
 
             if (!response.data) {
                 throw new Error('No data returned');
@@ -42,7 +44,7 @@ function DetallesEventoScreen({ navigation, route }) {
             setInscripciones(prev => prev + 1);
             Alert.alert("Inscripción exitosa!");
         } catch (error) {
-            Alert.alert("Error", `Hubo un error en la inscripción: ${error.message}`);
+            Alert.alert("Error", `Hubo un error en la inscripción: ${error}`);
         }
     };
 
