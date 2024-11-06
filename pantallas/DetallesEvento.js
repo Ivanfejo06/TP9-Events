@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Button, Alert, ScrollView, SafeAreaView } from 
 import axios from 'axios';
 import DBDomain from '../constants/DBDomain.js';
 import { useUserContext } from '../context/userContext.js';
+import { useFocusEffect } from '@react-navigation/native';  // Importamos useFocusEffect
 
 function DetallesEventoScreen({ navigation, route }) {
     const { id_event } = route.params;
@@ -11,7 +12,9 @@ function DetallesEventoScreen({ navigation, route }) {
     const [error, setError] = useState(null);
     const [capacidadMaxima, setCapacidadMaxima] = useState(0);
     const [inscripciones, setInscripciones] = useState(0);
+    const [usuarioInscripto, setUsuarioInscripto] = useState(false);  // Estado para verificar si el usuario está inscrito.
 
+    // Función para obtener los datos del evento.
     const fetchEvents = async () => {
         const urlApi = `${DBDomain}/api/event/${id_event}`;
         try {
@@ -23,6 +26,21 @@ function DetallesEventoScreen({ navigation, route }) {
         }
     };
 
+    // Función para verificar si el usuario está inscrito en el evento.
+    const verificarInscripcion = async () => {
+        const urlApi = `${DBDomain}/api/event/${id_event}/enrollment`;
+        try {
+            const response = await axios.get(urlApi, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const isInscribed = response.data.some(item => item.id_user === usuario.id);
+            setUsuarioInscripto(isInscribed);
+        } catch (error) {
+            console.error('Error verifying enrollment:', error);
+        }
+    };
+
+    // Función para inscribirse al evento.
     const inscribirse = async () => {
         const urlApi = `${DBDomain}/api/event/${id_event}/enrollment`;
         try {
@@ -35,30 +53,62 @@ function DetallesEventoScreen({ navigation, route }) {
                 rating: '',
             }, {
                 headers: { Authorization: `Bearer ${token}` },
-              });
+            });
 
             if (!response.data) {
                 throw new Error('No data returned');
             }
 
             setInscripciones(prev => prev + 1);
+            setUsuarioInscripto(true);  // El usuario ahora está inscrito.
             Alert.alert("Inscripción exitosa!");
         } catch (error) {
-            Alert.alert("Error", `Hubo un error en la inscripción: ${error}`);
+            Alert.alert("Error", `Hubo un error en la inscripción: ${error.message}`);
         }
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const event = await fetchEvents();
-            if (event) {
-                setEvento(event);
-                setCapacidadMaxima(event.Location?.max_capacity || 0);
-            }
-        };
+    // Función para cancelar la inscripción.
+    const cancelarInscripcion = async () => {
+        const urlApi = `${DBDomain}/api/event/${id_event}/enrollment`;
+        try {
+            const response = await axios.delete(urlApi, {
+                data: { id_user: usuario.id },
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
-        fetchData();
-    }, []);
+            if (!response.data) {
+                throw new Error('No data returned');
+            }
+
+            setInscripciones(prev => prev - 1);
+            setUsuarioInscripto(false);  // El usuario ha cancelado su inscripción.
+            Alert.alert("Inscripción cancelada!");
+        } catch (error) {
+            Alert.alert("Error", `Hubo un error al cancelar la inscripción: ${error.message}`);
+        }
+    };
+
+    // Usamos useFocusEffect para ejecutar las funciones cada vez que la pantalla recibe foco.
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchData = async () => {
+                const event = await fetchEvents();
+                if (event) {
+                    setEvento(event);
+                    setCapacidadMaxima(event.Location?.max_capacity || 0);
+                }
+            };
+
+            const fetchInscripciones = async () => {
+                // Verificar si el usuario ya está inscrito.
+                await verificarInscripcion();
+            };
+
+            fetchData();
+            fetchInscripciones();
+
+        }, [id_event, usuario.id]) // El useFocusEffect se ejecuta cuando cambia el id_event o usuario.id
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -81,7 +131,15 @@ function DetallesEventoScreen({ navigation, route }) {
                             </Text>
                             <Text style={styles.info}>Inscripciones: {inscripciones}</Text>
                         </View>
-                        <Button title="Inscribirse" onPress={inscribirse} color="#841584" />
+
+                        {!usuarioInscripto ? (
+                            <Button title="Inscribirse" onPress={inscribirse} color="#841584" />
+                        ) : (
+                            <>
+                                <Text style={styles.inscritoText}>Ya estás inscrito en este evento</Text>
+                                <Button title="Cancelar inscripción" onPress={cancelarInscripcion} color="red" />
+                            </>
+                        )}
                     </>
                 ) : (
                     <Text style={styles.loadingText}>Cargando...</Text>
@@ -131,6 +189,13 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         color: '#fff',
+    },
+    inscritoText: {
+        color: 'green',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 10,
+        textAlign: 'center',
     },
 });
 

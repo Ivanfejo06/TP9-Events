@@ -55,12 +55,7 @@ const LoginScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (token !== null) {
-      if (email === "nicole@gmail.com"){
-        navigation.navigate('AdminEvents');
-      }
-      else{
-        navigation.navigate('Home');
-      }
+      navigation.navigate('Home');
     }
   }, [token]);
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert, FlatList, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, FlatList, SafeAreaView, ScrollView, Modal } from 'react-native';
 import axios from 'axios';
 import DBDomain from '../constants/DBDomain.js';
 import { useUserContext } from '../context/userContext.js';
@@ -9,6 +9,9 @@ function EventDetailScreen({ route, navigation }) {
   const [event, setEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
   const { usuario, token } = useUserContext();
+
+  // Estado para el modal de confirmación
+  const [showModal, setShowModal] = useState(false);
 
   const fetchEventDetails = async () => {
     try {
@@ -22,7 +25,7 @@ function EventDetailScreen({ route, navigation }) {
   const fetchParticipants = async () => {
     try {
       const response = await axios.get(`${DBDomain}/api/event/${id_event}/enrollment`);
-      console.log(response.data)
+      console.log(response.data);
       setParticipants(response.data);
     } catch (error) {
       console.error('Error fetching participants:', error);
@@ -41,6 +44,15 @@ function EventDetailScreen({ route, navigation }) {
     }
   };
 
+  const confirmDeleteEvent = () => {
+    setShowModal(false); // Cerrar el modal
+    handleDeleteEvent();  // Ejecutar la eliminación
+  };
+
+  const cancelDeleteEvent = () => {
+    setShowModal(false); // Solo cerrar el modal si se cancela
+  };
+
   useEffect(() => {
     fetchEventDetails();
     fetchParticipants();
@@ -54,7 +66,7 @@ function EventDetailScreen({ route, navigation }) {
             <Text style={styles.title}>{event.name}</Text>
             <Text style={styles.description}>{event.description}</Text>
             <Text style={styles.info}>Fecha: {event.start_date}</Text>
-            <Button title="Eliminar Evento" onPress={handleDeleteEvent} color="#841584" />
+            <Button title="Eliminar Evento" onPress={() => setShowModal(true)} color="#841584" />
             <Text style={styles.subtitle}>Participantes</Text>
             <FlatList
               data={participants}
@@ -71,6 +83,24 @@ function EventDetailScreen({ route, navigation }) {
           <Text style={styles.loadingText}>Cargando...</Text>
         )}
       </ScrollView>
+
+      {/* Modal de confirmación */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={cancelDeleteEvent} // Permite cerrar el modal si el usuario presiona la parte externa
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>¿Estás seguro de que deseas eliminar este evento?</Text>
+            <View style={styles.modalButtons}>
+              <Button title="Sí" onPress={confirmDeleteEvent} color="red" />
+              <Button title="No" onPress={cancelDeleteEvent} />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -113,6 +143,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     textAlign: 'center',
+  },
+  // Estilos del Modal
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semi-transparente
+  },
+  modalContainer: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
   },
 });
 

@@ -8,7 +8,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 function EditEventScreen({ route, navigation }) {
   const { id_event } = route.params;
-  const [participants, setParticipants] = useState([]);
   const [evento, setEvento] = useState({});
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -27,20 +26,10 @@ function EditEventScreen({ route, navigation }) {
   const { usuario, token } = useUserContext();
 
   useEffect(() => {
-    fetchParticipants();
     fetchEventData();
     fetchAndSetCategories();
     fetchAndSetLocations();
   }, []);
-
-  const fetchParticipants = async () => {
-    try {
-      const response = await axios.get(`${DBDomain}/api/event/${id_event}/enrollment`);
-      setParticipants(response.data);
-    } catch (error) {
-      console.error('Error fetching participants:', error);
-    }
-  };
 
   const fetchEventData = async () => {
     try {
@@ -61,7 +50,6 @@ function EditEventScreen({ route, navigation }) {
       console.error('Error fetching event data:', error);
     }
   };
-  
 
   const fetchAndSetCategories = async () => {
     try {
@@ -136,19 +124,9 @@ function EditEventScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Editar evento</Text>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.container}>
-          
-            <Text style={styles.title}>Participantes</Text>
-            <FlatList
-              data={participants}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => <Text>{item.first_name} {item.last_name}</Text>}
-              scrollEnabled={false}
-            />
-
-            <Text style={styles.title}>Registro de Evento</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 placeholder="Nombre"
@@ -232,6 +210,7 @@ function EditEventScreen({ route, navigation }) {
             <Button title="Confirmar" onPress={() => validateData() && setModalVisible(true)} color="#841584" />
             <Button title="Cancelar" onPress={() => navigation.navigate('Home')} color="#ccc" />
 
+            {/* Modal de confirmación */}
             <Modal
               animationType="slide"
               transparent={true}
@@ -255,7 +234,6 @@ function EditEventScreen({ route, navigation }) {
                 </View>
               </View>
             </Modal>
-          </View>
         </ScrollView>
       </TouchableWithoutFeedback>
     </SafeAreaView>
@@ -273,13 +251,15 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     alignItems: 'center',
     paddingHorizontal: 20,
+    width: "100%"
   },
   title: {
     fontSize: 40, 
     fontWeight: "bold",
     marginBottom: 30,
     color: "white",
-    marginTop: 20
+    marginTop: 20,
+    textAlign: "center"
   },
   inputContainer: {
     width: '100%',
@@ -297,7 +277,7 @@ const styles = StyleSheet.create({
   picker: {
     borderWidth: 1,
     borderColor: '#ccc',
-    marginVertical: 10,
+    marginVertical: 20,
     borderRadius: 5,
     backgroundColor: '#FFF',
   },
@@ -326,10 +306,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 15,
     width: '100%',
-  },
-  scrollContainer: {
-    alignItems: 'center',
-  },
+  }
 });
 
 export default EditEventScreen;

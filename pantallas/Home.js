@@ -44,6 +44,7 @@ function HomeScreen({ navigation }) {
       <Text style={styles.subtitle}>Bienvenido</Text>
       <View style={styles.buttonContainer}>
         <Button title="Cargar nuevo evento" onPress={() => navigation.navigate('Formulario')} />
+        <Button title="Panel de administrador" onPress={() => navigation.navigate('AdminEvents')} />
       </View>
       <FlatList
         data={eventos}
