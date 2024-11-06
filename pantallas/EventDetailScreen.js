@@ -51,7 +51,7 @@ function EventDetailScreen({ route, navigation }) {
             <Text style={styles.description}>{event.description}</Text>
             <Text style={styles.info}>Fecha: {event.start_date}</Text>
             <Button title="Eliminar Evento" onPress={handleDeleteEvent} color="#841584" />
-            <Text style={styles.title}>Participantes</Text>
+            <Text style={styles.subtitle}>Participantes</Text>
             <FlatList
               data={participants}
               keyExtractor={item => item.id.toString()}
@@ -84,6 +84,11 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: "bold",
     marginBottom: 30,
+    color: "white"
+  },
+  subtitle:{
+    fontSize: 16,
+    marginBottom: 20,
     color: "white"
   },
   description: {

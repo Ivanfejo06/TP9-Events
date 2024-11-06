@@ -9,7 +9,7 @@ function EditEventScreen({ route }) {
 
   const fetchParticipants = async () => {
     try {
-      const response = await axios.get(`${DBDomain}/api/event/${id_event}/participants`);
+      const response = await axios.get(`${DBDomain}/api/event/${id_event}/enrollment`);
       setParticipants(response.data);
     } catch (error) {
       console.error('Error fetching participants:', error);
@@ -26,7 +26,7 @@ function EditEventScreen({ route }) {
       <FlatList
         data={participants}
         keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => <Text>{item.name}</Text>}
+        renderItem={({ item }) => <Text>{item.first_name} {item.last_name}</Text>}
       />
     </View>
   );

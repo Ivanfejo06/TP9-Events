@@ -19,8 +19,8 @@ function FormularioScreen({ navigation }) {
   const [durationPickerOpen, setDurationPickerOpen] = useState(false);
   const [price, setPrice] = useState('');
   const [max_assistance, setMaxAssistance] = useState('');
-  const [modalVisible, setModalVisible] = useState(false); // Estado para el modal de resumen
-  const [eventCreated, setEventCreated] = useState(false); // Estado para controlar la creación de eventos
+  const [modalVisible, setModalVisible] = useState(false);
+  const [eventCreated, setEventCreated] = useState(false);
 
   const newEvent = {
     name,
@@ -89,6 +89,31 @@ function FormularioScreen({ navigation }) {
     setDurationPickerOpen(false);
   };
 
+  const validateData = () => {
+    if (!name || !description || !id_event_category || !id_event_location || !price || !max_assistance) {
+      Alert.alert("Error", "Todos los campos son obligatorios");
+      return false;
+    }
+
+    if (isNaN(price) || price <= 0) {
+      Alert.alert("Error", "El precio debe ser un número mayor a cero");
+      return false;
+    }
+
+    if (isNaN(max_assistance) || max_assistance <= 0) {
+      Alert.alert("Error", "La cantidad máxima de personas debe ser un número mayor a cero");
+      return false;
+    }
+
+    return true;
+  };
+
+  const openSummaryModal = () => {
+    if (validateData()) {
+      setModalVisible(true);
+    }
+  };
+
   const confirmEventCreation = async () => {
     const urlApi = `${DBDomain}/api/event`;
     try {
@@ -107,16 +132,12 @@ function FormularioScreen({ navigation }) {
         }
 
         const result = await response.json();
-        setEventCreated(true); // Cambiamos el estado para mostrar el modal de éxito
-        setModalVisible(false); // Cerrar el modal de resumen
+        setEventCreated(true);
+        setModalVisible(false);
     } catch (error) {
         console.log('Hubo un error al crear el evento', error);
         Alert.alert("Error", "No se pudo crear el evento", [{ text: "OK" }]);
     }
-  };
-
-  const openSummaryModal = () => {
-    setModalVisible(true);
   };
 
   return (
@@ -159,8 +180,6 @@ function FormularioScreen({ navigation }) {
                 <Picker.Item key={location.id} label={location.name} value={location.id} />
               ))}
             </Picker>
-
-            {/* Date Picker */}
             <Button title="Seleccionar Fecha" onPress={openDatePicker} />
             {showDatePicker && (
               <DateTimePicker
@@ -170,8 +189,6 @@ function FormularioScreen({ navigation }) {
                 onChange={handleDateChange}
               />
             )}
-
-            {/* Duration Picker */}
             <Button title={`Duración: ${duration_in_minutes} minutos`} onPress={openDurationPicker} />
             {durationPickerOpen && (
               <Picker
@@ -190,7 +207,6 @@ function FormularioScreen({ navigation }) {
                 ))}
               </Picker>
             )}
-
             <TextInput
               placeholder="Precio"
               value={price}
@@ -231,35 +247,15 @@ function FormularioScreen({ navigation }) {
               <Text>Cantidad máxima: {max_assistance}</Text>
               <View style={styles.buttonContainer}>
                 <Button title="Confirmar" onPress={confirmEventCreation} />
-                <Button title="Cancelar" onPress={() => setModalVisible(false)} />
+                <Button title="Cancelar" onPress={() => setModalVisible(false)} color="#ccc" />
               </View>
             </View>
           </Modal>
-
-          {/* Modal de éxito */}
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={eventCreated}
-            onRequestClose={() => {
-              setEventCreated(!eventCreated);
-              navigation.navigate('Home'); // Redirigir a Home al cerrar el modal
-            }}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalTitle}>Éxito</Text>
-              <Text>Su evento se ha publicado correctamente.</Text>
-              <Button title="Aceptar" onPress={() => {
-                setEventCreated(false);
-                navigation.navigate('Home');
-              }} />
-            </View>
-          </Modal>
-
         </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -301,6 +297,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   modalView: {
+    marginTop: 200,
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
