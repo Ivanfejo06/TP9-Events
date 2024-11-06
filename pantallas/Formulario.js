@@ -78,6 +78,7 @@ function FormularioScreen({ navigation }) {
   const openDatePicker = () => setShowDatePicker(true);
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || start_date;
+    console.log(currentDate)
     setShowDatePicker(false);
     setStartDate(currentDate);
   };
@@ -134,6 +135,8 @@ function FormularioScreen({ navigation }) {
         const result = await response.json();
         setEventCreated(true);
         setModalVisible(false);
+        Alert.alert("Exito!", "Se creó el evento exitosamente");
+        navigation.navigate('Home');
     } catch (error) {
         console.log('Hubo un error al crear el evento', error);
         Alert.alert("Error", "No se pudo crear el evento", [{ text: "OK" }]);

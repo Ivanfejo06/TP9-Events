@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Alert, FlatList, SafeAreaView, ScrollView } from 'react-native';
 import axios from 'axios';
 import DBDomain from '../constants/DBDomain.js';
+import { useUserContext } from '../context/userContext.js';
 
 function EventDetailScreen({ route, navigation }) {
   const { id_event } = route.params;
   const [event, setEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
+  const { usuario, token } = useUserContext();
 
   const fetchEventDetails = async () => {
     try {
@@ -29,7 +31,9 @@ function EventDetailScreen({ route, navigation }) {
 
   const handleDeleteEvent = async () => {
     try {
-      await axios.delete(`${DBDomain}/api/event/${id_event}`);
+      await axios.delete(`${DBDomain}/api/event/${id_event}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       Alert.alert("Éxito", "Evento eliminado correctamente", [{ text: "OK", onPress: () => navigation.navigate('AdminEvents') }]);
     } catch (error) {
       console.error('Error deleting event:', error);
