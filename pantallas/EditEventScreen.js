@@ -87,6 +87,7 @@ function EditEventScreen({ route, navigation }) {
 
   const confirmEventCreation = async () => {
     const newEvent = {
+      id: id_event,
       name,
       description,
       id_event_category,
@@ -99,15 +100,16 @@ function EditEventScreen({ route, navigation }) {
     };
 
     try {
-      const response = await axios.post(`${DBDomain}/api/event`, newEvent, {
+      const response = await axios.put(`${DBDomain}/api/event`, newEvent, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEventCreated(true);
       setModalVisible(false);
-      Alert.alert("Éxito", "Evento creado exitosamente");
+      Alert.alert("Éxito", "Evento editado exitosamente");
+      navigation.goBack()
     } catch (error) {
       console.error('Error creating event:', error);
-      Alert.alert("Error", "No se pudo crear el evento");
+      Alert.alert("Error", "No se pudo editar el evento");
     }
   };
 
@@ -116,11 +118,12 @@ function EditEventScreen({ route, navigation }) {
     setDurationPickerOpen(false);
   };
 
-  const handleDateChange = (selectedDate) => {
+  const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || start_date;
+    console.log(currentDate)
     setShowDatePicker(false);
-    setStartDate(new Date(currentDate));  // Ensure it's a Date object
-  };  
+    setStartDate(currentDate);
+  };
 
   return (
     <SafeAreaView style={styles.container}>

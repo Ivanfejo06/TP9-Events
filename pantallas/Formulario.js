@@ -325,6 +325,32 @@ const styles = StyleSheet.create({
     marginTop: 15,
     width: '100%',
   },
+  modalView: {
+    marginTop: 200,
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  // Fondo semitransparente negro para el modal
+  modalBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Fondo negro semitransparente
+    zIndex: 1, // Asegura que el fondo se dibuje detrás del contenido del modal
+  },
 });
 
 export default FormularioScreen;

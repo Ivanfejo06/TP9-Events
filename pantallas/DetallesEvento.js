@@ -30,11 +30,13 @@ function DetallesEventoScreen({ navigation, route }) {
     const verificarInscripcion = async () => {
         const urlApi = `${DBDomain}/api/event/${id_event}/enrollment`;
         try {
-            const response = await axios.get(urlApi, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            const isInscribed = response.data.some(item => item.id_user === usuario.id);
-            setUsuarioInscripto(isInscribed);
+            const response = await axios.get(urlApi);
+            console.log(response.data)
+            const enrollment = response.data[0]
+            if(enrollment.user_id = usuario.id)
+            {
+                setUsuarioInscripto(true);
+            }
         } catch (error) {
             console.error('Error verifying enrollment:', error);
         }

@@ -19,8 +19,7 @@ function HomeScreen({ navigation }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       
-      const data = response.data; // Obtiene los datos directamente de la respuesta
-      console.log('data: ', data);
+      const data = response.data;
       return data;
     } catch (error) {
       console.log('Hubo un error en el fetchEvents', error);

@@ -81,6 +81,7 @@ function AdminEventsScreen({ navigation }) {
             renderItem={({ item }) => (
               <View style={styles.eventContainer}>
                 <Text style={styles.eventName}>{item.name}</Text>
+                <Button title="Ver Detalles" onPress={() => navigation.navigate('EventDetail', { id_event: item.id })} color="#841584" />
               </View>
             )}
             scrollEnabled={false}
