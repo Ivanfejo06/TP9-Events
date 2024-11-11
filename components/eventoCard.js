@@ -29,10 +29,10 @@ const EventoCard = ({ props }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fefefe',
+    backgroundColor: '#3b3b3b',
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: 2,
+    borderColor: '#242424',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -50,29 +50,29 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333', // Color del texto
+    color: 'white', // Color del texto
   },
   descripcion: {
     fontSize: 16,
     marginBottom: 15,
-    color: '#555', // Color del texto de la descripción
+    color: 'white', // Color del texto de la descripción
   },
   subtitulo: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
     marginBottom: 5,
-    color: '#666', // Color del texto del subtítulo
+    color: '#AAA', // Color del texto del subtítulo
   },
   item: {
     fontSize: 16,
-    color: '#007BFF', // Color azul para los elementos de categoría y ubicación
+    color: 'white', // Color azul para los elementos de categoría y ubicación
     marginBottom: 5, // Espaciado entre ítems
   },
   info: {
     fontSize: 16,
     marginBottom: 5,
-    color: '#444', // Color del texto de la información
+    color: 'white', // Color del texto de la información
   },
 });
 export default EventoCard;

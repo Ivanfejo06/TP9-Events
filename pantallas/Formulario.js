@@ -240,14 +240,14 @@ function FormularioScreen({ navigation }) {
             }}>
             <View style={styles.modalView}>
               <Text style={styles.modalTitle}>Resumen del Evento</Text>
-              <Text>Nombre: {name}</Text>
-              <Text>Descripción: {description}</Text>
-              <Text>Categoría: {id_event_category}</Text>
-              <Text>Ubicación: {id_event_location}</Text>
-              <Text>Fecha: {start_date.toLocaleDateString()}</Text>
-              <Text>Duración: {duration_in_minutes} minutos</Text>
-              <Text>Precio: {price}</Text>
-              <Text>Cantidad máxima: {max_assistance}</Text>
+              <Text style={styles.modalText}>Nombre: {name}</Text>
+              <Text style={styles.modalText}>Descripción: {description}</Text>
+              <Text style={styles.modalText}>Categoría: {id_event_category}</Text>
+              <Text style={styles.modalText}>Ubicación: {id_event_location}</Text>
+              <Text style={styles.modalText}>Fecha: {start_date.toLocaleDateString()}</Text>
+              <Text style={styles.modalText}>Duración: {duration_in_minutes} minutos</Text>
+              <Text style={styles.modalText}>Precio: {price}</Text>
+              <Text style={styles.modalText}>Cantidad máxima: {max_assistance}</Text>
               <View style={styles.buttonContainer}>
                 <Button title="Confirmar" onPress={confirmEventCreation} />
                 <Button title="Cancelar" onPress={() => setModalVisible(false)} color="#ccc" />
@@ -302,9 +302,9 @@ const styles = StyleSheet.create({
   modalView: {
     marginTop: 200,
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#3b3b3b',
     borderRadius: 20,
-    padding: 35,
+    padding: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -314,43 +314,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    color: "white"
   },
   modalTitle: {
     fontSize: 20,
     marginBottom: 15,
+    color: "white"
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#CCC',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 15,
     width: '100%',
-  },
-  modalView: {
-    marginTop: 200,
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  // Fondo semitransparente negro para el modal
-  modalBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Fondo negro semitransparente
-    zIndex: 1, // Asegura que el fondo se dibuje detrás del contenido del modal
-  },
+  }
 });
 
 export default FormularioScreen;

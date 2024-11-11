@@ -34,15 +34,25 @@ function EventDetailScreen({ route, navigation }) {
 
   const handleDeleteEvent = async () => {
     try {
-      await axios.delete(`${DBDomain}/api/event/${id_event}`, {
+      const response = await axios.delete(`${DBDomain}/api/event/${id_event}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+  
+      // Si la eliminación es exitosa
       Alert.alert("Éxito", "Evento eliminado correctamente", [{ text: "OK", onPress: () => navigation.navigate('AdminEvents') }]);
     } catch (error) {
-      console.error('Error deleting event:', error);
-      Alert.alert("Error", "No se pudo eliminar el evento");
+      // Verificar si el error tiene un código 400, y mostrar un mensaje específico
+      if (error.response && error.response.status === 400) {
+        Alert.alert(
+          "Error",
+          "El evento no está vacío. Debe eliminar todos los participantes antes de poder eliminar el evento."
+        );
+      } else {
+        console.error('Error deleting event:', error);
+        Alert.alert("Error", "No se pudo eliminar el evento");
+      }
     }
-  };
+  };  
 
   const confirmDeleteEvent = () => {
     setShowModal(false); // Cerrar el modal
@@ -154,7 +164,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: 300,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#3b3b3b',
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -162,6 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
     textAlign: 'center',
+    color: "white"
   },
   modalButtons: {
     flexDirection: 'row',
